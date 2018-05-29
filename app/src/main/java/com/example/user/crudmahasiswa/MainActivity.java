@@ -6,18 +6,26 @@ import android.os.Build;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telecom.Call;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.user.crudmahasiswa.adapter.MahasiswaAdapter;
 import com.example.user.crudmahasiswa.model.Mahasiswa;
+import com.example.user.crudmahasiswa.model.MahasiswaResult;
+import com.example.user.crudmahasiswa.network.ApiClient;
+import com.example.user.crudmahasiswa.network.MahasiswaService;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,38 +57,58 @@ public class MainActivity extends AppCompatActivity {
 
 
         //1. data
-        String[] nama = new String[] {"kemala", "yuliana", "puspawaty"}; //menampilkan data statis
+        //1.a. data 1 dimensi array
+//        String[] nama = new String[] {"kemala", "yuliana", "puspawaty"}; //menampilkan data statis
+//
+        //1.b. data lebih dari 1
+//        Mahasiswa mahasiswa1 = new Mahasiswa();
+//        mahasiswa1.setNama("Kemala Yuliana");
+//        mahasiswa1.setNim("3.34.15.1.14");
+//        mahasiswa1.setEmail("kemala@gmail.com");
+//        mahasiswa1.setFoto("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMdm9TwaOE33jkpfTmFZYIgO4GQELztH_ZXZYCU2lOTLQ12PkwJA");
+//
+//        Mahasiswa mahasiswa2 = new Mahasiswa(
+//                "Masha",
+//                "3.34.15.1.15",
+//                "masha@gmail.com",
+//                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRJsacl3ijlE9GrDaYu2IbEpqGXQJBszI1U4bY2cKZjn2I1HBl"
+//        );
+//
+//        ArrayList<Mahasiswa> mahasiswas = new ArrayList<>();
+//        mahasiswas.add(mahasiswa1);
+//        mahasiswas.add(mahasiswa2);
 
-        Mahasiswa mahasiswa1 = new Mahasiswa();
-        mahasiswa1.setNama("Kemala Yuliana");
-        mahasiswa1.setNim("3.34.15.1.14");
-        mahasiswa1.setEmail("kemala@gmail.com");
-        mahasiswa1.setFoto("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMdm9TwaOE33jkpfTmFZYIgO4GQELztH_ZXZYCU2lOTLQ12PkwJA");
+        //1.c. load data API JSON (Retrofit Library)
+        MahasiswaService service = ApiClient.getRetrofit().create(MahasiswaService.class);
+        retrofit2.Call<MahasiswaResult> mahasiswas = service.getMahasiswas();
+        mahasiswas.enqueue(new Callback<MahasiswaResult>() {
+            @Override
+            public void onResponse(retrofit2.Call<MahasiswaResult> call, Response<MahasiswaResult> response) {
+                Toast.makeText(
+                        getApplicationContext(),
+                        "Jumlah mahasiswa : " + response.body().getMahasiswas().size(),
+                        Toast.LENGTH_LONG
+                ).show();
+            }
 
-        Mahasiswa mahasiswa2 = new Mahasiswa(
-                "Masha",
-                "3.34.15.1.15",
-                "masha@gmail.com",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRJsacl3ijlE9GrDaYu2IbEpqGXQJBszI1U4bY2cKZjn2I1HBl"
-        );
+            @Override
+            public void onFailure(retrofit2.Call<MahasiswaResult> call, Throwable t) {
 
-        ArrayList<Mahasiswa> mahasiswas = new ArrayList<>();
-        mahasiswas.add(mahasiswa1);
-        mahasiswas.add(mahasiswa2);
-
-        //load data API JSON (Retrofit Library)
+            }
+        });
 
         //2. adapter
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
-                nama); //membuat array adapter
+        //2.a. adapter 1 dimensi
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+//                android.R.layout.simple_list_item_1,
+//                nama); //membuat array adapter
 
-        MahasiswaAdapter mahasiswaAdapter = new MahasiswaAdapter( this,
-                R.layout.item_mahasiswa,
-                mahasiswas);
+//        MahasiswaAdapter mahasiswaAdapter = new MahasiswaAdapter( this,
+//                R.layout.item_mahasiswa,
+//                mahasiswas);
 
         //3. activity (menampilkan data)
-        ListView lvDaftarNama = (ListView) findViewById(R.id.lv_daftar_nama);
-        lvDaftarNama.setAdapter(mahasiswaAdapter);
+//        ListView lvDaftarNama = (ListView) findViewById(R.id.lv_daftar_nama);
+//        lvDaftarNama.setAdapter(mahasiswaAdapter);
     }
 }
